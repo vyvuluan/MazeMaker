@@ -53,20 +53,28 @@ public class Player : MonoBehaviour
             Debug.Log("check ray");
             isCheckRay = true;
             Ray ray = new(transform.position, Vector3.down);
-            Debug.DrawRay(ray.origin, ray.direction * 100f, Color.yellow);
-            newPosition = transform.position + GetDir(pivoteDirection) * distance;
-            Debug.Log("new " + newPosition);
-            if (!Physics.Raycast(ray, out hit, Mathf.Infinity, roadLayer)) return;
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, roadLayer))
+            {
+                Debug.DrawRay(ray.origin, ray.direction * 100f, Color.yellow);
+                newPosition = transform.position + GetDir(pivoteDirection) * distance;
+                Pivote pivote = hit.collider.gameObject.GetComponent<Pivote>();
+                if (pivote.Type == PivoteType.ChangeDirection)
+                {
+                    int index = (pivoteDirection == PivoteDirection.Up || pivoteDirection == PivoteDirection.Down) ? 1 : 0;
+                    newPosition = transform.position + GetDir(pivote.PivoteDirectionList[index]) * distance;
+                }
+                Handle(pivote.Type);
+                pivote.Handle();
+            }
         }
-
+        //move
         if (hit.collider != null)
         {
             Pivote pivote = hit.collider.gameObject.GetComponent<Pivote>();
-            Handle(pivote.Type);
-            pivote.Handle();
             //PivoteDirection pivoteDirectionTemp = pivote.CheckDirection(pivoteDirection);
             if (pivote.CheckDirection(pivoteDirection))
             {
+
                 var step = 5f * Time.deltaTime;
                 Debug.Log(newPosition);
 
@@ -88,7 +96,6 @@ public class Player : MonoBehaviour
 
 
     }
-
     public Vector3 GetDir(PivoteDirection pivoteDirection)
     {
         switch (pivoteDirection)
@@ -104,7 +111,6 @@ public class Player : MonoBehaviour
             default: return Vector3.zero;
         }
     }
-
     public void Handle(PivoteType type)
     {
         switch (type)
@@ -112,14 +118,12 @@ public class Player : MonoBehaviour
             case PivoteType.Normal:
 
                 break;
+            case PivoteType.ChangeDirection:
             case PivoteType.Brick:
                 AddBrick();
                 break;
             case PivoteType.NeedBrick:
                 NeedBrick();
-                break;
-            case PivoteType.ChangeDirection:
-
                 break;
             case PivoteType.Win:
 

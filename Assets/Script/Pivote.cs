@@ -16,6 +16,7 @@ public class Pivote : MonoBehaviour
     [SerializeField] protected PivoteType type;
 
     public PivoteType Type { get => type; }
+    public List<PivoteDirection> PivoteDirectionList { get => pivoteDirectionList; }
 
     public virtual void Handle()
     {
@@ -24,7 +25,9 @@ public class Pivote : MonoBehaviour
 
     public bool CheckDirection(PivoteDirection direction)
     {
-        PivoteDirection typeTemp = pivoteDirectionList.Where(x => x == direction).FirstOrDefault();
+        //Debug.Log(type);
+        if (type == PivoteType.ChangeDirection) return true;
+        PivoteDirection typeTemp = PivoteDirectionList.Where(x => x == direction).FirstOrDefault();
         if (typeTemp == PivoteDirection.None) return false;
         return true;
     }
