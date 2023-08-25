@@ -51,47 +51,52 @@ public class Player : MonoBehaviour
         if (!isCheckRay)
         {
             Debug.Log("check ray");
-            isCheckRay = true;
             Ray ray = new(transform.position, Vector3.down);
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, roadLayer))
             {
-                Debug.DrawRay(ray.origin, ray.direction * 100f, Color.yellow);
-                newPosition = transform.position + GetDir(pivoteDirection) * distance;
                 Pivote pivote = hit.collider.gameObject.GetComponent<Pivote>();
+                newPosition = transform.position + GetDir(pivoteDirection) * distance;
                 if (pivote.Type == PivoteType.ChangeDirection)
                 {
                     int index = (pivoteDirection == PivoteDirection.Up || pivoteDirection == PivoteDirection.Down) ? 1 : 0;
                     newPosition = transform.position + GetDir(pivote.PivoteDirectionList[index]) * distance;
+                    dirInput = pivote.PivoteDirectionList[index];
                 }
                 Handle(pivote.Type);
                 pivote.Handle();
             }
+            isCheckRay = true;
+
         }
-        //move
-        if (hit.collider != null)
+        else
         {
-            Pivote pivote = hit.collider.gameObject.GetComponent<Pivote>();
-            //PivoteDirection pivoteDirectionTemp = pivote.CheckDirection(pivoteDirection);
-            if (pivote.CheckDirection(pivoteDirection))
+            //move
+            if (hit.collider != null)
             {
-
-                var step = 5f * Time.deltaTime;
-                Debug.Log(newPosition);
-
-                transform.position = Vector3.MoveTowards(transform.position, newPosition, step);
-                if (Vector3.Distance(transform.position, newPosition) < 0.001f)
+                Pivote pivote = hit.collider.gameObject.GetComponent<Pivote>();
+                //PivoteDirection pivoteDirectionTemp = pivote.CheckDirection(pivoteDirection);
+                if (pivote.CheckDirection(pivoteDirection))
                 {
-                    isCheckRay = false;
+
+                    var step = 5f * Time.deltaTime;
+                    Debug.Log(newPosition);
+
+                    transform.position = Vector3.MoveTowards(transform.position, newPosition, step);
+                    if (Vector3.Distance(transform.position, newPosition) < 0.001f)
+                    {
+                        isCheckRay = false;
+                    }
+                    //else
+                    //{
+                    //}
                 }
-                //else
-                //{
-                //}
-            }
-            else
-            {
-                // Debug.Log("stop");
+                else
+                {
+                    // Debug.Log("stop");
+                }
             }
         }
+
 
 
 
@@ -126,9 +131,19 @@ public class Player : MonoBehaviour
                 NeedBrick();
                 break;
             case PivoteType.Win:
-
+                for (int i = list.Count - 1; i >= 0; i--)
+                {
+                    RemoveBrick(list[i]);
+                }
                 break;
         }
+    }
+    private void RemoveBrick(GameObject go)
+    {
+        twei1.transform.position += new Vector3(0, -0.2f, 0);
+        jiao.transform.position += new Vector3(0, -0.2f, 0);
+        Destroy(go);
+        list.RemoveAt(list.Count - 1);
     }
     public void NeedBrick()
     {

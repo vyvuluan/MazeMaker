@@ -22425,7 +22425,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4157892317022374}
-  m_Layer: 0
+  - component: {fileID: 1743573043}
+  - component: {fileID: 2102140629542044328}
+  m_Layer: 6
   m_Name: winpos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22514,6 +22516,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -0, z: -0}
+--- !u!65 &1743573043
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377060364527856}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 7.020331, y: 3.3209565, z: 4.957723}
+  m_Center: {x: 0.02026105, y: 1.1604775, z: 2.0013607}
+--- !u!114 &2102140629542044328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377060364527856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d1b5bcd56eac84c95bd48e6ec3c40b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pivoteDirectionList: 04000000
+  type: 4
+  particleSystem1: {fileID: 0}
 --- !u!1 &1382597685722805
 GameObject:
   m_ObjectHideFlags: 0
