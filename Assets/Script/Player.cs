@@ -3,40 +3,79 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
+    private const float dragDistance = 1f;
+    private const float distance = 1f;
     [SerializeField] private GameObject brickPrefab;
     [SerializeField] private Transform brickParent;
     [SerializeField] private GameObject twei1;
     [SerializeField] private GameObject jiao;
     [SerializeField] private LayerMask roadLayer;
     [SerializeField] private List<GameObject> list = new();
-    private float distance = 1f;
     private bool isCheckRay = false;
+    private bool canInput = true;
+    private Vector3 mouseDownPos, mouseUpPos;
     private RaycastHit hit;
     private Vector3 newPosition;
     private PivoteDirection dirInput;
     private void Update()
     {
+        if (canInput)
+        {
+            InputSystem();
+            canInput = false;
+        }
         GetPivoteCurrent(dirInput);
     }
-    public void SetDirInput(int i)
+    public void InputSystem()
     {
-        switch (i)
+        if (Input.GetMouseButtonDown(0))
         {
-            case 0:
-                dirInput = PivoteDirection.Up;
-                break;
-            case 1:
-                dirInput = PivoteDirection.Down;
-                break;
-            case 2:
-                dirInput = PivoteDirection.Left;
-                break;
-            case 3:
-                dirInput = PivoteDirection.Right;
-                break;
+            mouseDownPos = Input.mousePosition;
         }
-        isCheckRay = false;
+        else if (Input.GetMouseButtonUp(0))
+        {
+            mouseUpPos = Input.mousePosition;
+            if (Mathf.Abs(mouseUpPos.x - mouseDownPos.x) > dragDistance || Mathf.Abs(mouseUpPos.y - mouseDownPos.y) > dragDistance)
+            {
+                if (Mathf.Abs(mouseUpPos.x - mouseDownPos.x) > Mathf.Abs(mouseUpPos.y - mouseDownPos.y))
+                {
+                    if (mouseUpPos.x > mouseDownPos.x)
+                    { //Right move  
+                        Debug.Log("right");
+                        dirInput = PivoteDirection.Right;
+                        isCheckRay = false;
+                    }
+                    else
+                    { //Left move  
+                        Debug.Log("Left");
+                        dirInput = PivoteDirection.Left;
+
+                        isCheckRay = false;
+                    }
+                }
+                else
+                {
+                    if (mouseUpPos.y > mouseDownPos.y)
+                    {
+                        //Up move  
+                        Debug.Log("Up");
+                        dirInput = PivoteDirection.Up;
+                        isCheckRay = false;
+                    }
+                    else
+                    {
+                        //Down move  
+                        Debug.Log("Down");
+                        dirInput = PivoteDirection.Down;
+                        isCheckRay = false;
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("Tapping");
+            }
+        }
     }
     public void AddBrick()
     {
@@ -79,20 +118,16 @@ public class Player : MonoBehaviour
                 {
 
                     var step = 5f * Time.deltaTime;
-                    Debug.Log(newPosition);
-
                     transform.position = Vector3.MoveTowards(transform.position, newPosition, step);
                     if (Vector3.Distance(transform.position, newPosition) < 0.001f)
                     {
                         isCheckRay = false;
                     }
-                    //else
-                    //{
-                    //}
                 }
                 else
                 {
                     // Debug.Log("stop");
+                    canInput = true;
                 }
             }
         }
@@ -121,7 +156,6 @@ public class Player : MonoBehaviour
         switch (type)
         {
             case PivoteType.Normal:
-
                 break;
             case PivoteType.ChangeDirection:
             case PivoteType.Brick:
