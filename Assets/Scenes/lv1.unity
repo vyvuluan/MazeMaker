@@ -6705,10 +6705,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3718751b05744fb448844489f9eded13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brickPrefab: {fileID: 1531101969777205, guid: 8aad5fca35890fd4389dabb982d52236, type: 3}
   brickParent: {fileID: 689873759}
+  brickPrefab: {fileID: 1531101969777205, guid: 8aad5fca35890fd4389dabb982d52236, type: 3}
   twei1: {fileID: 415949811}
   jiao: {fileID: 1533190575}
+  animator: {fileID: 1602172551}
   roadLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -11868,6 +11869,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4604800304189370, guid: 2b1b6fa84e1873741b6c2efda43c58ef, type: 3}
   m_PrefabInstance: {fileID: 1599655693}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1602172551 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95809777293889810, guid: c84b41a4245d5c241bc7ff57b0cca3f4, type: 3}
+  m_PrefabInstance: {fileID: 42719079}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1641272846
 PrefabInstance:

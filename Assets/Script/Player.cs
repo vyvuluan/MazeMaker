@@ -5,10 +5,11 @@ public class Player : MonoBehaviour
 {
     private const float dragDistance = 1f;
     private const float distance = 1f;
-    [SerializeField] private GameObject brickPrefab;
     [SerializeField] private Transform brickParent;
+    [SerializeField] private GameObject brickPrefab;
     [SerializeField] private GameObject twei1;
     [SerializeField] private GameObject jiao;
+    [SerializeField] private Animator animator;
     [SerializeField] private LayerMask roadLayer;
     [SerializeField] private List<GameObject> list = new();
     private bool isCheckRay = false;
@@ -84,12 +85,12 @@ public class Player : MonoBehaviour
         newBrick.transform.SetParent(brickParent);
         twei1.transform.position += new Vector3(0, 0.2f, 0);
         jiao.transform.position += new Vector3(0, 0.2f, 0);
+        animator.SetInteger("state", 1);
     }
     private void GetPivoteCurrent(PivoteDirection pivoteDirection)
     {
         if (!isCheckRay)
         {
-            Debug.Log("check ray");
             Ray ray = new(transform.position, Vector3.down);
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, roadLayer))
             {
@@ -121,6 +122,7 @@ public class Player : MonoBehaviour
                     transform.position = Vector3.MoveTowards(transform.position, newPosition, step);
                     if (Vector3.Distance(transform.position, newPosition) < 0.001f)
                     {
+                        animator.SetInteger("state", 0);
                         isCheckRay = false;
                     }
                 }
