@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Cinemachine;
+using DG.Tweening;
+using System.Collections.Generic;
 using UnityEngine;
-
 public class Player : MonoBehaviour
 {
     private const float dragDistance = 1f;
@@ -11,13 +12,24 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject jiao;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask roadLayer;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private List<GameObject> list = new();
     private bool isCheckRay = false;
     private bool canInput = true;
+    private bool isAnimating = false;
+    private bool isWin = false;
+    private float startTime;
+    private float startRotationY;
+    private float startFov;
     private Vector3 mouseDownPos, mouseUpPos;
     private RaycastHit hit;
     private Vector3 newPosition;
     private PivoteDirection dirInput;
+    private void Start()
+    {
+        startRotationY = virtualCamera.transform.eulerAngles.y;
+        startFov = virtualCamera.m_Lens.FieldOfView;
+    }
     private void Update()
     {
         if (canInput)
@@ -26,6 +38,32 @@ public class Player : MonoBehaviour
             canInput = false;
         }
         GetPivoteCurrent(dirInput);
+        PerformEffects();
+    }
+    private void PerformEffects()
+    {
+        if (isAnimating)
+        {
+            float elapsed = Time.time - startTime;
+            float t = Mathf.Clamp01(elapsed / 1f);
+
+            float newRotationY = Mathf.Lerp(startRotationY, 90, t);
+            virtualCamera.transform.eulerAngles = new Vector3(virtualCamera.transform.eulerAngles.x, newRotationY, virtualCamera.transform.eulerAngles.z);
+
+            float newFov = Mathf.Lerp(startFov, 30, t);
+            virtualCamera.m_Lens.FieldOfView = newFov;
+
+            if (t >= 1.0f)
+            {
+                isAnimating = false;
+            }
+        }
+    }
+    public void StartAnimation()
+    {
+        startTime = Time.time;
+        isAnimating = true;
+        isWin = true;
     }
     public void InputSystem()
     {
@@ -42,15 +80,12 @@ public class Player : MonoBehaviour
                 {
                     if (mouseUpPos.x > mouseDownPos.x)
                     { //Right move  
-                        Debug.Log("right");
                         dirInput = PivoteDirection.Right;
                         isCheckRay = false;
                     }
                     else
                     { //Left move  
-                        Debug.Log("Left");
                         dirInput = PivoteDirection.Left;
-
                         isCheckRay = false;
                     }
                 }
@@ -59,14 +94,12 @@ public class Player : MonoBehaviour
                     if (mouseUpPos.y > mouseDownPos.y)
                     {
                         //Up move  
-                        Debug.Log("Up");
                         dirInput = PivoteDirection.Up;
                         isCheckRay = false;
                     }
                     else
                     {
                         //Down move  
-                        Debug.Log("Down");
                         dirInput = PivoteDirection.Down;
                         isCheckRay = false;
                     }
@@ -80,12 +113,22 @@ public class Player : MonoBehaviour
     }
     public void AddBrick()
     {
+        Debug.Log("Add");
         GameObject newBrick = Instantiate(brickPrefab, list.Count > 0 ? list[list.Count - 1].transform.position + new Vector3(0, 0.2f, 0) : brickParent.position, brickPrefab.transform.rotation);
         list.Add(newBrick);
         newBrick.transform.SetParent(brickParent);
         twei1.transform.position += new Vector3(0, 0.2f, 0);
         jiao.transform.position += new Vector3(0, 0.2f, 0);
         animator.SetInteger("state", 1);
+        if (list.Count > 18)
+        {
+            float targetFOV = virtualCamera.m_Lens.FieldOfView + 3f;
+            DOTween.To(() => virtualCamera.m_Lens.FieldOfView, x => virtualCamera.m_Lens.FieldOfView = x, targetFOV, 0.3f)
+           .OnComplete(() =>
+           {
+               // Zoom effect is complete
+           });
+        }
     }
     private void GetPivoteCurrent(PivoteDirection pivoteDirection)
     {
@@ -118,7 +161,7 @@ public class Player : MonoBehaviour
                 if (pivote.CheckDirection(pivoteDirection))
                 {
 
-                    var step = 5f * Time.deltaTime;
+                    var step = 10f * Time.deltaTime;
                     transform.position = Vector3.MoveTowards(transform.position, newPosition, step);
                     if (Vector3.Distance(transform.position, newPosition) < 0.001f)
                     {
@@ -167,6 +210,9 @@ public class Player : MonoBehaviour
                 NeedBrick();
                 break;
             case PivoteType.Win:
+                Debug.Log("luan");
+                if (!isWin)
+                    StartAnimation();
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
                     RemoveBrick(list[i]);
@@ -180,6 +226,7 @@ public class Player : MonoBehaviour
         jiao.transform.position += new Vector3(0, -0.2f, 0);
         Destroy(go);
         list.RemoveAt(list.Count - 1);
+
     }
     public void NeedBrick()
     {
@@ -190,6 +237,15 @@ public class Player : MonoBehaviour
             jiao.transform.position += new Vector3(0, -0.2f, 0);
             Destroy(go);
             list.RemoveAt(list.Count - 1);
+            if (list.Count > 18)
+            {
+                float targetFOV = virtualCamera.m_Lens.FieldOfView - 3f;
+                DOTween.To(() => virtualCamera.m_Lens.FieldOfView, x => virtualCamera.m_Lens.FieldOfView = x, targetFOV, 0.3f)
+               .OnComplete(() =>
+               {
+                   // Zoom effect is complete
+               });
+            }
         }
         else
         {
